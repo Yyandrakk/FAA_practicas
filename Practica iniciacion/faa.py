@@ -14,8 +14,10 @@ class Datos(object):
     #  tipoAtributos, nombreAtributos,nominalAtributos, datos y diccionarios
 
     def __init__(self, nombreFichero):
-        f = open(nombreFichero, 'r')
-        
+        with open(nombreFichero, 'r') as f:
+            nDatos =    int(f.readline().strip('\n'))
+            
+
 
 
     # TODO: implementar en la pr�ctica 1
