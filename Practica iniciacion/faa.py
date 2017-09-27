@@ -49,18 +49,6 @@ class Datos(object):
                         j+=1
                 i+=1
 
-
-            print self.nDatos
-            print self.nombreAtributos
-            print self.tipoAtributos
-            print self.nominalAtributos
-            print self.diccionarios
-            print self.datos
-
-
-
-
-
     # TODO: implementar en la prctica 1
 
     def extraeDatosTrain(idx):
