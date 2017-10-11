@@ -26,7 +26,7 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos, pred)) / len(datos)
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / len(datos[:, -1])
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -59,13 +59,20 @@ class Clasificador(object):
 
 class ClasificadorNaiveBayes(Clasificador):
 
-    tablas = []
+    tablasV = []
+    tablaC = {}
+
     # TODO: implementar
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
         tam = len(diccionario)
         nClases = len(diccionario[-1])
-        i=0
+        i = 0
+        numFilas = datostrain.shape[0]
+        for k in diccionario[-1].keys():
+            v = diccionario[-1][k]
+            self.tablaC[k] = datostrain[np.ix_(datostrain[:, -1] == v, (0, ))].shape[0] / numFilas
+
         while i < (tam - 1):
 
             if atributosDiscretos[i]:
@@ -80,9 +87,30 @@ class ClasificadorNaiveBayes(Clasificador):
                     t[0, v] = np.mean(datostrain[np.ix_(datostrain[:, -1] == v, (i, ))])
                     t[1, v] = np.var(datostrain[np.ix_(datostrain[:, -1] == v, (i ,))])
 
-            self.tablas.push(t)
+            self.tablasV.push(t)
             i += 1
 
     # TODO: implementar
     def clasifica(self, datostest, atributosDiscretos, diccionario):
+
+        clases = []
+        for fila in datostest:
+            i = 0
+            posterior = []
+            for k in diccionario[-1].keys():
+                v = diccionario[-1][k]
+                aux = 1
+                while i < (len(fila) - 1):
+                    if atributosDiscretos:
+                        aux*=(self.tablasV[i][fila[i], v] / sum(self.tablasV[i][:, v])
+                    else:
+
+                aux *= self.tablaC[k]
+                posterior.push(aux)
+
+            clases.push(posterior.find(max(posterior)))
+
+        return np.array(clases)
+
+
         pass
