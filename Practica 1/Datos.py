@@ -35,18 +35,19 @@ class Datos(object):
                         j += 1
                         self.diccionarios.append(dicAux)
                         i += 1
-                        i = 0
-                        self.datos = np.empty((self.nDatos, tam))
-                        while i < tam:
-                            if not self.nominalAtributos[i]:
-                                self.datos[:, i] = datosAux[:, i]
-                            else:
-                                dic = self.diccionarios[i]
-                                j = 0
-                                while j < self.nDatos:
-                                    self.datos[j, i] = dic[datosAux[j, i]]
-                                    j += 1
-                                    i += 1
+
+            i = 0
+            self.datos = np.empty((self.nDatos, tam))
+            while i < tam:
+                if not self.nominalAtributos[i]:
+                    self.datos[:, i] = datosAux[:, i]
+                else:
+                    dic = self.diccionarios[i]
+                    j = 0
+                    while j < self.nDatos:
+                        self.datos[j, i] = dic[datosAux[j, i]]
+                        j += 1
+                i += 1
 
 # TODO: implementar en la pr�ctica 1
     def extraeDatosTrain(self, idx):
