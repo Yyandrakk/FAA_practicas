@@ -1,7 +1,6 @@
-from abc import ABCMeta, abstractmethod
-import random
-import numpy as np
 import math
+import random
+from abc import ABCMeta, abstractmethod
 
 
 class Particion():
@@ -46,7 +45,7 @@ class ValidacionSimple(EstrategiaParticionado):
         random.seed(seed)
         numFilas = datos.shape[0]
         particion = Particion()
-        index = range(0, numFilas-1)
+        index = list(xrange(0, numFilas-1))
         random.shuffle(index)
         numTrain = int(math.ceil(numFilas * self.numeroParticiones))
         particion.indicesTrain = index[0: numTrain]
@@ -70,7 +69,7 @@ class ValidacionCruzada(EstrategiaParticionado):
     def creaParticiones(self, datos, seed=None):
         random.seed(seed)
         numFilas = datos.shape[0]
-        index = xrange(0, numFilas)
+        index = list(xrange(0, numFilas))
         random.shuffle(index)
         indexK = numFilas // self.numeroParticiones
         lIndex = [index[i:i + indexK] for i in xrange(0, len(index), indexK)]

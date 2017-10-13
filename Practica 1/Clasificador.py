@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+
 import numpy as np
 
 
@@ -26,7 +27,7 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / len(datos[:, -1])
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (len(datos[:, -1]) + 0.0)
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -50,7 +51,7 @@ class Clasificador(object):
                 clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
                 clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
-                errores.push(error(dTrain, clases))
+                errores=np.append(errores,[self.error(dTrain, clases)])
                 return np.mean(errores), np.std(errores)
 
 
@@ -73,21 +74,21 @@ class ClasificadorNaiveBayes(Clasificador):
             numFilas = 0.0000001
         for k in diccionario[-1].keys():
             v = diccionario[-1][k]
-            self.tablaC[k] = datostrain[np.ix_(datostrain[:, -1] == v, (0, ))].shape[0] / numFilas
+            self.tablaC[k] = datostrain[np.ix_(datostrain[:, -1] == v, (0, ))].shape[0] / (numFilas +0.0)
 
-        while i < (tam - 1):
+        while i < tam :
 
             if atributosDiscretos[i]:
                 nAtri = len(diccionario[i])
                 t = np.zeros((nAtri, nClases))
                 for fila in datostrain:
-                    t[fila[i], fila[-1]] += 1
+                    t[int(fila[i]), int(fila[-1])] += 1
             else:
                 t = np.zeros((2, nClases))
                 for k in diccionario[-1].keys():
                     v = diccionario[-1][k]
-                    t[0, v] = np.mean(datostrain[np.ix_(datostrain[:, -1] == v, (i, ))])
-                    t[1, v] = np.var(datostrain[np.ix_(datostrain[:, -1] == v, (i ,))])
+                    t[0, int(v)] = np.mean(datostrain[np.ix_(datostrain[:, -1] == v, (i, ))])
+                    t[1, int(v)] = np.var(datostrain[np.ix_(datostrain[:, -1] == v, (i ,))])
 
             self.tablasV.append(t)
             i += 1
@@ -103,14 +104,14 @@ class ClasificadorNaiveBayes(Clasificador):
                 v = diccionario[-1][k]
                 aux = 1
                 while i < (len(fila) - 1):
-                    if atributosDiscretos:
-                        aux=aux*(self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
+                    if atributosDiscretos[i]:
+                        aux*=(self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
                     #else:
                     i+=1
                 aux=aux*self.tablaC[k]
                 posterior.append(aux)
 
-            clases.append(max(posterior) in posterior)
+            clases.append(posterior.index(max(posterior)))
 
         return np.array(clases)
 
