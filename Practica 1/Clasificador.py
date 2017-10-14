@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
+import math
 
 
 class Clasificador(object):
@@ -52,7 +53,7 @@ class Clasificador(object):
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
                 clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
                 errores=np.append(errores,[self.error(dTrain, clases)])
-                return np.mean(errores), np.std(errores)
+            return errores
 
 
 
@@ -105,15 +106,16 @@ class ClasificadorNaiveBayes(Clasificador):
                 aux = 1
                 while i < (len(fila) - 1):
                     if atributosDiscretos[i]:
-                        aux*=(self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
-                    #else:
-                    i+=1
-                aux=aux*self.tablaC[k]
+                        aux *= (self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
+                    else:
+                        sqrt = math.sqrt(2*math.pi*self.tablasV[i][v][1])
+                        exp = math.exp(-(((fila[i]-self.tablasV[i][v][0])*(fila[i]-self.tablasV[i][v][0]))/(2*math.pi*self.tablasV[i][v][1])))
+                        aux *= (exp*sqrt)
+
+                    i += 1
+                aux = aux*self.tablaC[k]
                 posterior.append(aux)
 
             clases.append(posterior.index(max(posterior)))
 
         return np.array(clases)
-
-
-        pass
