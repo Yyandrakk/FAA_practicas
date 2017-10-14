@@ -109,8 +109,8 @@ class ClasificadorNaiveBayes(Clasificador):
                         aux *= (self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
                     else:
                         sqrt = math.sqrt(2*math.pi*self.tablasV[i][v][1])
-                        exp = math.exp(-(((fila[i]-self.tablasV[i][v][0])*(fila[i]-self.tablasV[i][v][0]))/(2*math.pi*self.tablasV[i][v][1])))
-                        aux *= (exp*sqrt)
+                        exp = math.exp(-(((fila[i]-self.tablasV[i][v][0])*(fila[i]-self.tablasV[i][v][0]))/(2*self.tablasV[i][v][1])))
+                        aux *= (exp/sqrt)
 
                     i += 1
                 aux = aux*self.tablaC[k]
