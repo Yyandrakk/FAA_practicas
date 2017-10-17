@@ -63,6 +63,10 @@ class ClasificadorNaiveBayes(Clasificador):
 
     tablasV = []
     tablaC = {}
+    laplace = 0
+
+    def __init__(self, laplace=0):
+        self.laplace = laplace
 
     # TODO: implementar
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
@@ -93,6 +97,19 @@ class ClasificadorNaiveBayes(Clasificador):
 
             self.tablasV.append(t)
             i += 1
+
+        if self.laplace == 1:
+            i = 0
+            while i < len(self.tablasV):
+                #si es nominal
+                if np.any(self.tablasV[i]) == 0:
+                    self.tablasV[i] += 1
+                i += 1
+        #if laplace == 1:
+            #recorrer lista tablasV
+                #ordenar fila
+                    #si el primer valor == 0
+                        #sumar 1 a todos
 
     # TODO: implementar
     def clasifica(self, datostest, atributosDiscretos, diccionario):
