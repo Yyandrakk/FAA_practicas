@@ -53,7 +53,7 @@ class Clasificador(object):
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
                 clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
                 errores=np.append(errores,[self.error(dTrain, clases)])
-            return errores
+            return errores.mean(), errores.var()
 
 
 
@@ -63,9 +63,9 @@ class ClasificadorNaiveBayes(Clasificador):
 
     tablasV = []
     tablaC = {}
-    laplace = 0
+    laplace = False
 
-    def __init__(self, laplace=0):
+    def __init__(self, laplace=False):
         self.laplace = laplace
 
     # TODO: implementar
@@ -88,6 +88,9 @@ class ClasificadorNaiveBayes(Clasificador):
                 t = np.zeros((nAtri, nClases))
                 for fila in datostrain:
                     t[int(fila[i]), int(fila[-1])] += 1
+                if self.laplace and np.any(t==0):
+                    t+=1
+
             else:
                 t = np.zeros((2, nClases))
                 for k in diccionario[-1].keys():
@@ -98,13 +101,8 @@ class ClasificadorNaiveBayes(Clasificador):
             self.tablasV.append(t)
             i += 1
 
-        if self.laplace == 1:
-            i = 0
-            while i < len(self.tablasV):
-                #si es nominal
-                if np.any(self.tablasV[i]) == 0:
-                    self.tablasV[i] += 1
-                i += 1
+
+
         #if laplace == 1:
             #recorrer lista tablasV
                 #ordenar fila
@@ -116,23 +114,24 @@ class ClasificadorNaiveBayes(Clasificador):
 
         clases = []
         for fila in datostest:
-            i = 0
-            posterior = []
+           #i = 0
+            posterior = {}
             for k in diccionario[-1].keys():
                 v = diccionario[-1][k]
                 aux = 1
+                i = 0
                 while i < (len(fila) - 1):
                     if atributosDiscretos[i]:
                         aux *= (self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
                     else:
-                        sqrt = math.sqrt(2*math.pi*self.tablasV[i][v][1])
-                        exp = math.exp(-(((fila[i]-self.tablasV[i][v][0])*(fila[i]-self.tablasV[i][v][0]))/(2*self.tablasV[i][v][1])))
+                        sqrt = math.sqrt(2*math.pi*self.tablasV[i][1,v])
+                        exp = math.exp(-(((fila[i]-self.tablasV[i][0,v])**2)/(2.0*self.tablasV[i][1,v])))
                         aux *= (exp/sqrt)
 
                     i += 1
                 aux = aux*self.tablaC[k]
-                posterior.append(aux)
+                posterior[k] = aux
 
-            clases.append(posterior.index(max(posterior)))
+            clases.append(diccionario[-1][max(posterior,key=posterior.get)])
 
         return np.array(clases)
