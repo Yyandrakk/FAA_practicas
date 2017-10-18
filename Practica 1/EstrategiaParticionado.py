@@ -1,7 +1,6 @@
-from abc import ABCMeta, abstractmethod
-import random
-import numpy as np
 import math
+import random
+from abc import ABCMeta, abstractmethod
 
 
 class Particion():
@@ -36,20 +35,20 @@ class EstrategiaParticionado(object):
 
 class ValidacionSimple(EstrategiaParticionado):
 
-    def __init__(self, k):
+    def __init__(self, porcentajeTrain=0.6):
         self.nombreEstrategia = "ValidacionSimple"
-        self.numeroParticiones = k
+        self.numeroParticiones = porcentajeTrain
 
     # Crea particiones segun el metodo tradicional de division de los datos segun el porcentaje deseado.
     # Devuelve una lista de particiones (clase Particion)
     # TODO: implementar
     def creaParticiones(self, datos, seed=None):
         random.seed(seed)
-        numFilas = datos.Rows.Count
+        numFilas = datos.shape[0]
         particion = Particion()
-        index = xrange(0, numFilas)
+        index = list(xrange(0, numFilas))
         random.shuffle(index)
-        numTrain = math.ceil(numFilas * self.numeroParticiones)
+        numTrain = int(math.ceil(numFilas * self.numeroParticiones))
         particion.indicesTrain = index[0: numTrain]
         particion.indicesTest = index[numTrain + 1:]
         self.particiones.append(particion)
@@ -59,7 +58,7 @@ class ValidacionSimple(EstrategiaParticionado):
 
 class ValidacionCruzada(EstrategiaParticionado):
 
-    def __init__(self, k):
+    def __init__(self, k=10):
         self.nombreEstrategia = "ValidacionCruzada"
         self.numeroParticiones = k
     # Crea particiones segun el metodo de validacion cruzada.
@@ -70,8 +69,8 @@ class ValidacionCruzada(EstrategiaParticionado):
 
     def creaParticiones(self, datos, seed=None):
         random.seed(seed)
-        numFilas = datos.Rows.Count
-        index = xrange(0, numFilas)
+        numFilas = datos.shape[0]
+        index = list(xrange(0, numFilas))
         random.shuffle(index)
         indexK = numFilas // self.numeroParticiones
         lIndex = [index[i:i + indexK] for i in xrange(0, len(index), indexK)]

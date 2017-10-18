@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
+
 import numpy as np
+import math
 
 
 class Clasificador(object):
@@ -26,7 +28,7 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / len(datos[:, -1])
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (len(datos[:, -1]) + 0.0)
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -38,20 +40,20 @@ class Clasificador(object):
         # y obtenemos el error en la particion de test i
         # - Para validacion simple (hold-out): entrenamos el clasificador con la particion de train
         # y obtenemos el error en la particion test
-        particionado.creaParticiones(dataset, seed)
+        particionado.creaParticiones(dataset.datos, seed)
         errores = np.array(())
         if len(particionado.particiones) == 1:
-            clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionario)
+            clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
-            clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionario)
-            return error(dTrain, clases), 0
+            clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+            return self.error(dTrain, clases), 0
         else:
             for particion in particionado.particiones:
-                clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionario)
+                clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionario)
-                errores.push(error(dTrain, clases))
-                return np.mean(errores), np.std(errores)
+                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+                errores=np.append(errores,[self.error(dTrain, clases)])
+            return errores.mean(), errores.var()
 
 
 
@@ -61,56 +63,69 @@ class ClasificadorNaiveBayes(Clasificador):
 
     tablasV = []
     tablaC = {}
+    laplace = False
+
+    def __init__(self, laplace=False):
+        self.laplace = laplace
 
     # TODO: implementar
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
-        tam = len(diccionario)
+        tam = len(diccionario)-1
         nClases = len(diccionario[-1])
         i = 0
         numFilas = datostrain.shape[0]
+        if numFilas == 0:
+            numFilas = 0.0000001
         for k in diccionario[-1].keys():
             v = diccionario[-1][k]
-            self.tablaC[k] = datostrain[np.ix_(datostrain[:, -1] == v, (0, ))].shape[0] / numFilas
+            self.tablaC[k] = datostrain[np.ix_(datostrain[:, -1] == v, (0, ))].shape[0] / (numFilas +0.0)
 
-        while i < (tam - 1):
+        while i < tam :
 
             if atributosDiscretos[i]:
                 nAtri = len(diccionario[i])
                 t = np.zeros((nAtri, nClases))
                 for fila in datostrain:
-                    t[fila[i], fila[-1]] += 1
+                    t[int(fila[i]), int(fila[-1])] += 1
+                if self.laplace and np.any(t==0):
+                    t+=1
+
             else:
                 t = np.zeros((2, nClases))
                 for k in diccionario[-1].keys():
                     v = diccionario[-1][k]
-                    t[0, v] = np.mean(datostrain[np.ix_(datostrain[:, -1] == v, (i, ))])
-                    t[1, v] = np.var(datostrain[np.ix_(datostrain[:, -1] == v, (i ,))])
+                    t[0, int(v)] = np.mean(datostrain[np.ix_(datostrain[:, -1] == v, (i, ))])
+                    t[1, int(v)] = np.var(datostrain[np.ix_(datostrain[:, -1] == v, (i ,))])
 
-            self.tablasV.push(t)
+            self.tablasV.append(t)
             i += 1
+
+
 
     # TODO: implementar
     def clasifica(self, datostest, atributosDiscretos, diccionario):
 
         clases = []
         for fila in datostest:
-            i = 0
-            posterior = []
+           #i = 0
+            posterior = {}
             for k in diccionario[-1].keys():
                 v = diccionario[-1][k]
                 aux = 1
+                i = 0
                 while i < (len(fila) - 1):
-                    if atributosDiscretos:
-                        aux*=(self.tablasV[i][fila[i], v] / sum(self.tablasV[i][:, v])
+                    if atributosDiscretos[i]:
+                        aux *= (self.tablasV[i][int(fila[i]), v] / sum(self.tablasV[i][:, v]))
                     else:
+                        sqrt = math.sqrt(2*math.pi*self.tablasV[i][1,v])
+                        exp = math.exp(-(((fila[i]-self.tablasV[i][0,v])**2)/(2.0*self.tablasV[i][1,v])))
+                        aux *= (exp/sqrt)
 
-                aux *= self.tablaC[k]
-                posterior.push(aux)
+                    i += 1
+                aux = aux*self.tablaC[k]
+                posterior[k] = aux
 
-            clases.push(posterior.find(max(posterior)))
+            clases.append(diccionario[-1][max(posterior,key=posterior.get)])
 
         return np.array(clases)
-
-
-        pass

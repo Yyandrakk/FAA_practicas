@@ -33,8 +33,8 @@ class Datos(object):
                     for x in sorted(auxC):
                         dicAux[x] = j
                         j += 1
-                        self.diccionarios.append(dicAux)
-                        i += 1
+                    self.diccionarios.append(dicAux)
+                i += 1
 
             i = 0
             self.datos = np.empty((self.nDatos, tam))
@@ -49,7 +49,7 @@ class Datos(object):
                         j += 1
                 i += 1
 
-# TODO: implementar en la pr�ctica 1
+# TODO
     def extraeDatosTrain(self, idx):
         return self.datos[idx, :]
 
