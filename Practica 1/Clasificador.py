@@ -103,12 +103,6 @@ class ClasificadorNaiveBayes(Clasificador):
 
 
 
-        #if laplace == 1:
-            #recorrer lista tablasV
-                #ordenar fila
-                    #si el primer valor == 0
-                        #sumar 1 a todos
-
     # TODO: implementar
     def clasifica(self, datostest, atributosDiscretos, diccionario):
 

@@ -7,7 +7,7 @@ from sklearn.naive_bayes import GaussianNB
 
 if __name__ == '__main__':
     dataset = Datos('./ConjuntosDatos/german.data')
-    estrategia = EstrategiaParticionado.ValidacionCruzada(10)
+    estrategia = EstrategiaParticionado.ValidacionSimple()
     clasificador = Clasificador.ClasificadorNaiveBayes()
     errores = clasificador.validacion(estrategia, dataset, clasificador)
     print errores

@@ -35,8 +35,9 @@ class EstrategiaParticionado(object):
 
 class ValidacionSimple(EstrategiaParticionado):
 
-    def __init__(self):
+    def __init__(self, porcentajeTrain=0.6):
         self.nombreEstrategia = "ValidacionSimple"
+        self.numeroParticiones = porcentajeTrain
 
     # Crea particiones segun el metodo tradicional de division de los datos segun el porcentaje deseado.
     # Devuelve una lista de particiones (clase Particion)
@@ -45,7 +46,7 @@ class ValidacionSimple(EstrategiaParticionado):
         random.seed(seed)
         numFilas = datos.shape[0]
         particion = Particion()
-        index = list(xrange(0, numFilas-1))
+        index = list(xrange(0, numFilas))
         random.shuffle(index)
         numTrain = int(math.ceil(numFilas * self.numeroParticiones))
         particion.indicesTrain = index[0: numTrain]
@@ -57,7 +58,7 @@ class ValidacionSimple(EstrategiaParticionado):
 
 class ValidacionCruzada(EstrategiaParticionado):
 
-    def __init__(self, k):
+    def __init__(self, k=10):
         self.nombreEstrategia = "ValidacionCruzada"
         self.numeroParticiones = k
     # Crea particiones segun el metodo de validacion cruzada.
