@@ -5,9 +5,6 @@ from abc import ABCMeta, abstractmethod
 
 class Particion():
 
-    indicesTrain = []
-    indicesTest = []
-
     def __init__(self):
         self.indicesTrain = []
         self.indicesTest = []
@@ -21,9 +18,7 @@ class EstrategiaParticionado(object):
     __metaclass__ = ABCMeta
 
     # Atributos: deben rellenarse adecuadamente para cada estrategia concreta
-    nombreEstrategia = "null"
-    numeroParticiones = 0
-    particiones = []
+
 
     @abstractmethod
     # TODO: esta funcion deben ser implementadas en cada estrategia concreta
@@ -38,6 +33,8 @@ class ValidacionSimple(EstrategiaParticionado):
     def __init__(self, porcentajeTrain=0.6):
         self.nombreEstrategia = "ValidacionSimple"
         self.numeroParticiones = porcentajeTrain
+        self.particiones = []
+        
 
     # Crea particiones segun el metodo tradicional de division de los datos segun el porcentaje deseado.
     # Devuelve una lista de particiones (clase Particion)
@@ -61,6 +58,7 @@ class ValidacionCruzada(EstrategiaParticionado):
     def __init__(self, k=10):
         self.nombreEstrategia = "ValidacionCruzada"
         self.numeroParticiones = k
+        self.particiones = []
     # Crea particiones segun el metodo de validacion cruzada.
     # El conjunto de entrenamiento se crea con las nfolds-1 particiones
     # y el de test con la particion restante

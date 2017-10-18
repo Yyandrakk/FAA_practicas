@@ -53,7 +53,7 @@ class Clasificador(object):
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
                 clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
                 errores=np.append(errores,[self.error(dTrain, clases)])
-            return errores.mean(), errores.var()
+            return errores.mean(), errores.std()
 
 
 
@@ -61,11 +61,9 @@ class Clasificador(object):
 
 class ClasificadorNaiveBayes(Clasificador):
 
-    tablasV = []
-    tablaC = {}
-    laplace = False
-
     def __init__(self, laplace=False):
+        self.tablasV = []
+        self.tablaC = {}
         self.laplace = laplace
 
     # TODO: implementar

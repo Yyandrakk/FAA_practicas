@@ -13,6 +13,11 @@ class Datos(object):
 
     # TODO: procesar el fichero para asignar correctamente las variables tipoAtributos, nombreAtributos,nominalAtributos, datos y diccionarios
     def __init__(self, nombreFichero):
+        self.tipoAtributos = []
+        self.nombreAtributos = []
+        self.nominalAtributos = []
+        self.datos = np.array(())
+        self.diccionarios = []
         with open(nombreFichero, 'r') as f:
             linesL = f.read().splitlines()
             con, nom = self.TiposDeAtributos
