@@ -68,7 +68,8 @@ class ClasificadorNaiveBayes(Clasificador):
 
     # TODO: implementar
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
-
+        self.tablasV = []
+        self.tablaC = {}
         tam = len(diccionario)-1
         nClases = len(diccionario[-1])
         i = 0

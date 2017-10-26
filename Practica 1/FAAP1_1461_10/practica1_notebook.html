@@ -11790,7 +11790,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[57]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">Clasificador</span>
@@ -11830,7 +11830,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[58]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Datos</span><span class="p">(</span><span class="s1">&#39;./ConjuntosDatos/tic-tac-toe.data&#39;</span><span class="p">)</span>
@@ -11854,7 +11854,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.303664921466
+<pre>0.29057591623
 </pre>
 </div>
 </div>
@@ -11874,7 +11874,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[59]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">encAtributos</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categorical_features</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nominalAtributos</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -11901,7 +11901,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.286458333333
+<pre>0.3125
 </pre>
 </div>
 </div>
@@ -11921,7 +11921,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clasificador</span> <span class="o">=</span> <span class="n">Clasificador</span><span class="o">.</span><span class="n">ClasificadorNaiveBayes</span><span class="p">(</span><span class="n">laplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -11943,7 +11943,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.294502617801
+<pre>0.298429319372
 </pre>
 </div>
 </div>
@@ -11954,7 +11954,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[61]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -11978,7 +11978,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.296875
+<pre>0.317708333333
 </pre>
 </div>
 </div>
@@ -11998,7 +11998,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[62]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Datos</span><span class="p">(</span><span class="s1">&#39;./ConjuntosDatos/german.data&#39;</span><span class="p">)</span>
@@ -12022,7 +12022,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.285714285714
+<pre>0.255639097744
 </pre>
 </div>
 </div>
@@ -12033,7 +12033,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[63]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">encAtributos</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categorical_features</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nominalAtributos</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -12060,7 +12060,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.23
+<pre>0.2825
 </pre>
 </div>
 </div>
@@ -12071,7 +12071,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[64]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clasificador</span> <span class="o">=</span> <span class="n">Clasificador</span><span class="o">.</span><span class="n">ClasificadorNaiveBayes</span><span class="p">(</span><span class="n">laplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -12093,7 +12093,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.271929824561
+<pre>0.240601503759
 </pre>
 </div>
 </div>
@@ -12104,7 +12104,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[65]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
@@ -12143,7 +12143,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.2975
+<pre>0.2825
 </pre>
 </div>
 </div>
@@ -12163,7 +12163,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[66]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">salida</span><span class="p">))</span>
@@ -12184,7 +12184,7 @@ div#notebook {
 
 
 <div class="output_html rendered_html output_subarea ">
-<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.303665</td><td>0.286458</td></tr><tr><td>NB con Laplace</td><td>0.294503</td><td>0.296875</td></tr></table>
+<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.290576</td><td>0.312500</td></tr><tr><td>NB con Laplace</td><td>0.298429</td><td>0.317708</td></tr></table>
 </div>
 
 </div>
@@ -12212,7 +12212,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[67]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">salida2</span><span class="p">))</span>
@@ -12233,7 +12233,7 @@ div#notebook {
 
 
 <div class="output_html rendered_html output_subarea ">
-<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.285714</td><td>0.230000</td></tr><tr><td>NB con Laplace</td><td>0.271930</td><td>0.297500</td></tr></table>
+<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.255639</td><td>0.282500</td></tr><tr><td>NB con Laplace</td><td>0.240602</td><td>0.282500</td></tr></table>
 </div>
 
 </div>
@@ -12254,7 +12254,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[68]:</div>
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Datos</span><span class="p">(</span><span class="s1">&#39;./ConjuntosDatos/tic-tac-toe.data&#39;</span><span class="p">)</span>
@@ -12278,7 +12278,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.298947368421 0.0309409230667
+<pre>0.301052631579 0.0593967830723
 </pre>
 </div>
 </div>
@@ -12289,7 +12289,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[69]:</div>
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">encAtributos</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categorical_features</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nominalAtributos</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -12327,7 +12327,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[70]:</div>
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clasificador</span> <span class="o">=</span> <span class="n">Clasificador</span><span class="o">.</span><span class="n">ClasificadorNaiveBayes</span><span class="p">(</span><span class="n">laplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -12349,7 +12349,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.300526315789 0.0398716778242
+<pre>0.303684210526 0.0512746123591
 </pre>
 </div>
 </div>
@@ -12360,7 +12360,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -12404,7 +12404,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[72]:</div>
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Datos</span><span class="p">(</span><span class="s1">&#39;./ConjuntosDatos/german.data&#39;</span><span class="p">)</span>
@@ -12428,7 +12428,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.233 0.041
+<pre>0.243 0.0402616442784
 </pre>
 </div>
 </div>
@@ -12439,7 +12439,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[73]:</div>
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">encAtributos</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categorical_features</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">nominalAtributos</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -12477,7 +12477,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[74]:</div>
+<div class="prompt input_prompt">In&nbsp;[39]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clasificador</span> <span class="o">=</span> <span class="n">Clasificador</span><span class="o">.</span><span class="n">ClasificadorNaiveBayes</span><span class="p">(</span><span class="n">laplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -12499,7 +12499,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.2315 0.0394049489278
+<pre>0.2445 0.0372122291727
 </pre>
 </div>
 </div>
@@ -12510,7 +12510,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[75]:</div>
+<div class="prompt input_prompt">In&nbsp;[40]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
@@ -12568,7 +12568,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[76]:</div>
+<div class="prompt input_prompt">In&nbsp;[41]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">salida</span><span class="p">))</span>
@@ -12589,7 +12589,7 @@ div#notebook {
 
 
 <div class="output_html rendered_html output_subarea ">
-<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.2989 ± 0.031</td><td>0.3359 ± 0.087</td></tr><tr><td>NB con Laplace</td><td>0.3005 ± 0.040</td><td>0.3349 ± 0.088</td></tr></table>
+<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.3011 ± 0.059</td><td>0.3359 ± 0.087</td></tr><tr><td>NB con Laplace</td><td>0.3037 ± 0.051</td><td>0.3349 ± 0.088</td></tr></table>
 </div>
 
 </div>
@@ -12618,7 +12618,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[77]:</div>
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">salida2</span><span class="p">))</span>
@@ -12639,7 +12639,7 @@ div#notebook {
 
 
 <div class="output_html rendered_html output_subarea ">
-<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.2330 ± 0.041</td><td>0.2860 ± 0.034</td></tr><tr><td>NB con Laplace</td><td>0.2315 ± 0.039</td><td>0.2860 ± 0.034</td></tr></table>
+<table><tr><th>Clasificador</th><th>Nuestro</th><th>Sklearn</th></tr><tr><td>NB sin Laplace</td><td>0.2430 ± 0.040</td><td>0.2860 ± 0.034</td></tr><tr><td>NB con Laplace</td><td>0.2445 ± 0.037</td><td>0.2860 ± 0.034</td></tr></table>
 </div>
 
 </div>
