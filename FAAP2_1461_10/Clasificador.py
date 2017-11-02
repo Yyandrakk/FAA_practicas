@@ -187,3 +187,33 @@ class ClasificadorVecinosProximos(Clasificador):
             clases.append(np.bincount(KvecinosProximos).argmax())
 
         return np.array(clases)
+
+
+class ClasificadorRegresionLogistica(Clasificador):
+
+    def __init__(self, consApren=1,nEpoc=10,w = None):
+        self.consApren = consApren
+        self.nEpoc = nEpoc
+        self.w = w
+
+    def perceptron(self,p):
+        return 1.0/(1+math.exp(-p))
+
+    def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
+
+        i = 0
+        if self.w is None or len(self.w)!= len(diccionario):
+           self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
+        while i < self.nEpoc:
+            for fila in datostrain:
+                aux = np.append([1],fila[:-1])
+                self.w = self.w - (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))*aux
+            i=i+1
+
+    def clasifica(self, datostest, atributosDiscretos, diccionario):
+
+        clases = []
+        for fila in datostest:
+           aux = np.append([1], fila[:-1])
+           clases.append(1 if self.perceptron(np.dot(self.w,aux)) >= 0.5 else 0 )
+        return np.array(clases)

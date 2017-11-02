@@ -11,9 +11,9 @@ import numpy as np
 
 if __name__ == '__main__':
     errores =     []
-    dataset = Datos('./ConjuntoDatos/example1.data')
+    dataset = Datos('./ConjuntoDatos/wdbc.data')
     estrategia = EstrategiaParticionado.ValidacionSimple()
-    clasificador = Clasificador.ClasificadorVecinosProximos()
+    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=10)
     error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador)
     print error_media
 
