@@ -51,6 +51,8 @@ class Clasificador(object):
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
             clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+            print dTrain[:,-1]
+            print clases
             return self.error(dTrain, clases), 0
         else:
             for particion in particionado.particiones:
@@ -143,7 +145,7 @@ class ClasificadorVecinosProximos(Clasificador):
 
     def normalizarDatos(self, datos):
         i = 0
-        tam = len(self.listaMediasDesv)-1
+        tam = len(self.listaMediasDesv)
         aux = np.zeros(datos.shape)
         print tam
         while i < tam:
@@ -161,17 +163,19 @@ class ClasificadorVecinosProximos(Clasificador):
             aux = {}
             aux["media"] = np.mean(datostrain[:,nCol])
             aux["desv"] = np.std(datostrain[:,nCol])
-            self.listaMediasDesv.append(aux)
+            self.listaMediasDesv[nCol] = (aux)
 
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
         tam = len(diccionario)-1
         i = 0
 
+        self.listaMediasDesv = [None] * tam
+
         while i < tam :
 
             if atributosDiscretos[i]:
-                self.listaMediasDesv.append({})
+                self.listaMediasDesv[i] = {}
             else:
                 self.calcularMediasDesv(datostrain,i)
             i += 1
@@ -186,11 +190,6 @@ class ClasificadorVecinosProximos(Clasificador):
         clases = []
         for fila in datosNorm:
             dstEu = euclidean_distances(self.datosTrainNormalizado, [fila]).tolist()
-
-            '''dist = DistanceMetric.get_metric('euclidean')
-            >> > X = [[0, 1, 2],
-                      [3, 4, 5]]
-            >> > dist.pairwise(X)'''
 
             aux = []
 
