@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import math
 from sklearn.metrics.pairwise import euclidean_distances
+from sklearn.neighbors.dist_metrics import DistanceMetric
 
 
 class Clasificador(object):
@@ -29,7 +30,10 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (len(datos[:, -1]) + 0.0)
+        aux = len(datos[:, -1])
+        if aux == 0:
+            aux = 0.0000001
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (aux + 0.0)
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -141,8 +145,10 @@ class ClasificadorVecinosProximos(Clasificador):
         i = 0
         tam = len(self.listaMediasDesv)-1
         aux = np.zeros(datos.shape)
+        print tam
         while i < tam:
             if self.listaMediasDesv[i]:
+                print tam, i
                 aux[:,i] = (datos[:,i]-self.listaMediasDesv[i]["media"])/(self.listaMediasDesv[i]["desv"]+0.0)
             else:
                 aux[:,i] = datos[:, i]
@@ -181,15 +187,20 @@ class ClasificadorVecinosProximos(Clasificador):
         for fila in datosNorm:
             dstEu = euclidean_distances(self.datosTrainNormalizado, [fila]).tolist()
 
+            '''dist = DistanceMetric.get_metric('euclidean')
+            >> > X = [[0, 1, 2],
+                      [3, 4, 5]]
+            >> > dist.pairwise(X)'''
+
             aux = []
 
             for row in dstEu:
                 aux.append(row[0])
-
+            #print self.datosTrainNormalizado[:,-1]
             sortIndex = np.argsort(aux)
 
             KvecinosProximos=self.datosTrainNormalizado[sortIndex[0:self.k],-1]
 
             clases.append(np.bincount(KvecinosProximos.tolist()).argmax())
 
-        return np.array(clases)
+        return np.array(clases).astype('float')

@@ -13,11 +13,11 @@ import numpy as np
 
 if __name__ == '__main__':
     errores = []
-    dataset = Datos('./ConjuntoDatos/example1.data')
-    estrategia = EstrategiaParticionado.ValidacionSimple()
+    dataset = Datos('./ConjuntoDatos/wdbc.data')
+    estrategia = EstrategiaParticionado.ValidacionCruzada()
     clasificador = Clasificador.ClasificadorVecinosProximos()
     error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador)
-    print error_media, error_std
+    print error_media
 
     encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1], sparse=False)
     X = encAtributos.fit_transform(dataset.datos[:, :-1])
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
 
-    knn = KNeighborsClassifier(n_neighbors=3)
+    knn = KNeighborsClassifier(n_neighbors=3, p=2, metric='euclidean')
 
     knn.fit(x_train, y_train)
 
