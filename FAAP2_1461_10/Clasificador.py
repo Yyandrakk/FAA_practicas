@@ -137,15 +137,9 @@ class ClasificadorVecinosProximos(Clasificador):
         self.listaMediasDesv = []
         self.datosTrainNormalizado = None
 
-    def calcularMediasDesv(self,datostrain,nCol):
-            aux = {}
-            aux["media"] = np.mean(datostrain[:,nCol])
-            aux["desv"] = np.std(datostrain[:,nCol])
-            self.listaMediasDesv.append(aux)
-
     def normalizarDatos(self, datos):
         i = 0
-        tam = len(self.listaMediasDesv)
+        tam = len(self.listaMediasDesv)-1
         aux = np.zeros(datos.shape)
         while i < tam:
             if self.listaMediasDesv[i]:
@@ -154,13 +148,18 @@ class ClasificadorVecinosProximos(Clasificador):
                 aux[:,i] = datos[:, i]
             i=i+1
         aux[:,i] = datos[:, i]
+
         return aux
 
-
+    def calcularMediasDesv(self,datostrain,nCol):
+            aux = {}
+            aux["media"] = np.mean(datostrain[:,nCol])
+            aux["desv"] = np.std(datostrain[:,nCol])
+            self.listaMediasDesv.append(aux)
 
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
-        tam = len(diccionario) - 1
+        tam = len(diccionario)-1
         i = 0
 
         while i < tam :
@@ -168,7 +167,7 @@ class ClasificadorVecinosProximos(Clasificador):
             if atributosDiscretos[i]:
                 self.listaMediasDesv.append({})
             else:
-               self.calcularMediasDesv(datostrain,i)
+                self.calcularMediasDesv(datostrain,i)
             i += 1
 
         self.datosTrainNormalizado = self.normalizarDatos(datostrain)
@@ -180,10 +179,17 @@ class ClasificadorVecinosProximos(Clasificador):
         i = 0
         clases = []
         for fila in datosNorm:
-            dstEu =euclidean_distances(self.datosTrainNormalizado, [fila])
-            sortIndex = np.argsort(dstEu)
+            dstEu = euclidean_distances(self.datosTrainNormalizado, [fila]).tolist()
+
+            aux = []
+
+            for row in dstEu:
+                aux.append(row[0])
+
+            sortIndex = np.argsort(aux)
+
             KvecinosProximos=self.datosTrainNormalizado[sortIndex[0:self.k],-1]
 
-            clases.append(np.bincount(KvecinosProximos).argmax())
+            clases.append(np.bincount(KvecinosProximos.tolist()).argmax())
 
         return np.array(clases)
