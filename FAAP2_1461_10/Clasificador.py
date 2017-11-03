@@ -46,13 +46,13 @@ class Clasificador(object):
         if len(particionado.particiones) == 1:
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
-            clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+            clases = clasificador.clasifica(dTrain[:,:-1], dataset.nominalAtributos, dataset.diccionarios)
             return self.error(dTrain, clases), 0
         else:
             for particion in particionado.particiones:
                 clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+                clases = clasificador.clasifica(dTrain[:,0:-1], dataset.nominalAtributos, dataset.diccionarios)
                 errores=np.append(errores,[self.error(dTrain, clases)])
             return errores.mean(), errores.std()
 
@@ -214,6 +214,6 @@ class ClasificadorRegresionLogistica(Clasificador):
 
         clases = []
         for fila in datostest:
-           aux = np.append([1], fila[:-1])
+           aux = np.append([1], fila)
            clases.append(1 if self.perceptron(np.dot(self.w,aux)) >= 0.5 else 0 )
         return np.array(clases)
