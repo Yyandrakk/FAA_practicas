@@ -29,7 +29,10 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (len(datos[:, -1]) + 0.0)
+        aux = len(datos[:, -1])
+        if aux == 0:
+            aux = 0.0000001
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (aux + 0.0)
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -46,13 +49,13 @@ class Clasificador(object):
         if len(particionado.particiones) == 1:
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
-            clases = clasificador.clasifica(dTrain[:,:-1], dataset.nominalAtributos, dataset.diccionarios)
+            clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
             return self.error(dTrain, clases), 0
         else:
             for particion in particionado.particiones:
                 clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
                 dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain[:,0:-1], dataset.nominalAtributos, dataset.diccionarios)
+                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
                 errores=np.append(errores,[self.error(dTrain, clases)])
             return errores.mean(), errores.std()
 
@@ -137,12 +140,6 @@ class ClasificadorVecinosProximos(Clasificador):
         self.listaMediasDesv = []
         self.datosTrainNormalizado = None
 
-    def calcularMediasDesv(self,datostrain,nCol):
-            aux = {}
-            aux["media"] = np.mean(datostrain[:,nCol])
-            aux["desv"] = np.std(datostrain[:,nCol])
-            self.listaMediasDesv.append(aux)
-
     def normalizarDatos(self, datos):
         i = 0
         tam = len(self.listaMediasDesv)
@@ -154,21 +151,28 @@ class ClasificadorVecinosProximos(Clasificador):
                 aux[:,i] = datos[:, i]
             i=i+1
         aux[:,i] = datos[:, i]
+
         return aux
 
-
+    def calcularMediasDesv(self,datostrain,nCol):
+            aux = {}
+            aux["media"] = np.mean(datostrain[:,nCol])
+            aux["desv"] = np.std(datostrain[:,nCol])
+            self.listaMediasDesv[nCol] = (aux)
 
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
-        tam = len(diccionario) - 1
+        tam = len(diccionario)-1
         i = 0
+
+        self.listaMediasDesv = [None] * tam
 
         while i < tam :
 
             if atributosDiscretos[i]:
-                self.listaMediasDesv.append({})
+                self.listaMediasDesv[i] = {}
             else:
-               self.calcularMediasDesv(datostrain,i)
+                self.calcularMediasDesv(datostrain,i)
             i += 1
 
         self.datosTrainNormalizado = self.normalizarDatos(datostrain)
@@ -180,24 +184,36 @@ class ClasificadorVecinosProximos(Clasificador):
         i = 0
         clases = []
         for fila in datosNorm:
-            dstEu =euclidean_distances(self.datosTrainNormalizado, [fila])
-            sortIndex = np.argsort(dstEu)
+            dstEu = euclidean_distances(self.datosTrainNormalizado[:,:-1], [fila[:-1]]).tolist()
+
+            aux = []
+
+            for row in dstEu:
+                aux.append(row[0])
+            sortIndex = np.argsort(aux)
+
             KvecinosProximos=self.datosTrainNormalizado[sortIndex[0:self.k],-1]
 
-            clases.append(np.bincount(KvecinosProximos).argmax())
+            clases.append(np.bincount(KvecinosProximos.tolist()).argmax())
 
-        return np.array(clases)
+        return np.array(clases).astype('float')
+
+
 
 
 class ClasificadorRegresionLogistica(Clasificador):
 
-    def __init__(self, consApren=1,nEpoc=10,w = None):
+    def __init__(self, consApren=1,nEpoc=50,w = None):
         self.consApren = consApren
         self.nEpoc = nEpoc
         self.w = w
 
     def perceptron(self,p):
-        return 1.0/(1+math.exp(-p))
+        try:
+           aux=1.0/(1+math.exp(-p))
+        except OverflowError:
+            aux= 0.0 # 1/ inf = 0
+        return aux
 
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
@@ -214,6 +230,6 @@ class ClasificadorRegresionLogistica(Clasificador):
 
         clases = []
         for fila in datostest:
-           aux = np.append([1], fila)
+           aux = np.append([1], fila[:-1])
            clases.append(1 if self.perceptron(np.dot(self.w,aux)) >= 0.5 else 0 )
         return np.array(clases)

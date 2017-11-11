@@ -14,9 +14,8 @@ def plotModel(x,y,clase,clf,title,diccionarios):
 
 
     xx, yy = np.meshgrid(np.arange(x_min, x_max, hx), np.arange(y_min, y_max, hy))
-
     if isinstance(clf, Clasificador.Clasificador):	
-        z = clf.clasifica(np.c_[xx.ravel(), yy.ravel()], [False, False, True], diccionarios)   
+        z = clf.clasifica(np.c_[xx.ravel(), yy.ravel(),np.zeros(len(yy.ravel()))], [False, False, True], diccionarios)
     elif hasattr(clf, "decision_function"):
         z = clf.decision_function(np.c_[xx.ravel(), yy.ravel()])
     else:
