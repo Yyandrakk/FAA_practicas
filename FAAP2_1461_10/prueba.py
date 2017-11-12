@@ -12,14 +12,14 @@ from sklearn.model_selection import train_test_split
 
 if __name__ == '__main__':
     errores =     []
-    dataset = Datos('./ConjuntoDatos/example1.data')
+    dataset = Datos('./ConjuntoDatos/wdbc.data')
     estrategia = EstrategiaParticionado.ValidacionCruzada()
     #clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100,consApren=0.05)
    # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
     #print error_media
 
-    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=1000, consApren=0.01)
-    error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 45)
+    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100, consApren=0.01)
+    error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
     print error_media
 
     # encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1], sparse=False)
@@ -35,14 +35,14 @@ if __name__ == '__main__':
     # # check the accuracy on the training set
     # print 1 - accuracy_score(y_test, pre)
     # estrategia.creaParticiones(dataset.datos)
-
-    ii = estrategia.particiones[-1].indicesTrain
-    clasificador.entrenamiento(dataset.extraeDatosTrain(ii),dataset.nominalAtributos,dataset.diccionarios)
-    plotModel(dataset.datos[ii, 0], dataset.datos[ii, 1], dataset.datos[ii, -1] != 0, clasificador, "Frontera", dataset.diccionarios)
-    #plt.figure()
-    plt.plot(dataset.datos[dataset.datos[:,-1]==0,0],dataset.datos[dataset.datos[:,-1]==0,1],'bo')
-    plt.plot(dataset.datos[dataset.datos[:,-1]==1,0],dataset.datos[dataset.datos[:,-1]==1,1],'ro')
-    plt.show()
+    #
+    # ii = estrategia.particiones[-1].indicesTrain
+    # clasificador.entrenamiento(dataset.extraeDatosTrain(ii),dataset.nominalAtributos,dataset.diccionarios)
+    # plotModel(dataset.datos[ii, 0], dataset.datos[ii, 1], dataset.datos[ii, -1] != 0, clasificador, "Frontera", dataset.diccionarios)
+    # #plt.figure()
+    # plt.plot(dataset.datos[dataset.datos[:,-1]==0,0],dataset.datos[dataset.datos[:,-1]==0,1],'ro')
+    # plt.plot(dataset.datos[dataset.datos[:,-1]==1,0],dataset.datos[dataset.datos[:,-1]==1,1],'bo')
+    # plt.show()
 
 
 
