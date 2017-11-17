@@ -25,16 +25,18 @@ class PreprocesamientoAG(object):
         :type clasificador: Clasificador
         :return:
         '''
-        if type(dataset) != Datos or type(clasificador) != Clasificador:
-            raise TypeError, "dataset debe ser tipo Datos y clasificador de tipo Clasificador"
+        #if type(dataset) != Datos or type(clasificador) != Clasificador:
+        #    raise TypeError, "dataset debe ser tipo Datos y clasificador de tipo Clasificador"
 
         generacionMax, pParada = self.geraciones
         poblacion = np.unpackbits(np.random.randint(low=1,high=len(dataset.diccionarios), size=(self.tamPob,1),dtype=np.uint8),axis=1)
-        dat = dataset.extraeDatosRelevantes(poblacion)
+        dataset.datos = dataset.extraeDatosRelevantes(poblacion)
         g = 0
-        p = 1
+        p = 0
         estrategia = EstrategiaParticionado.ValidacionSimple()
         while g < generacionMax and p < pParada:
-            error_media, error_std = clasificador.validacion(estrategia, dat, clasificador, 42)
+            error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
             p = 1 - error_media
             g+=1
+
+        print error_media, error_std

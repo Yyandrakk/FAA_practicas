@@ -1,17 +1,17 @@
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-
 import Clasificador
 import EstrategiaParticionado
 from Datos import Datos
-from plotModel import plotModel
-import matplotlib.pyplot as plt
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
-
+from PreprocesamientoAG import PreprocesamientoAG
 
 if __name__ == '__main__':
-    print 'a'
+    errores = []
+    dataset = Datos('./ConjuntoDatos/wdbc.data')
+    estrategia = EstrategiaParticionado.ValidacionSimple()
+    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=10, consApren=1)
+
+    prepro = PreprocesamientoAG()
+    prepro.seleccionarAtributos(dataset, clasificador)
+
 
 
 
