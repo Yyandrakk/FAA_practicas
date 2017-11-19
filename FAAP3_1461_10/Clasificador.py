@@ -2,8 +2,12 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import math
+
+from sklearn.externals.joblib import Parallel, delayed
 from sklearn.metrics.pairwise import euclidean_distances
 
+def unwrap_self(arg, **kwarg):
+    return Clasificador.valCruzada(*arg, **kwarg)
 
 class Clasificador(object):
 
@@ -35,6 +39,14 @@ class Clasificador(object):
         return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (aux + 0.0)
 
 
+    def valCruzada(self,particion,clasificador,dataset):
+        clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos,
+                                   dataset.diccionarios)
+        dTrain = dataset.extraeDatosTest(particion.indicesTest)
+        clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+        return self.error(dTrain, clases)
+
+
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
     # TODO: implementar esta funcion
     def validacion(self, particionado, dataset, clasificador, seed=None):
@@ -45,18 +57,15 @@ class Clasificador(object):
         # - Para validacion simple (hold-out): entrenamos el clasificador con la particion de train
         # y obtenemos el error en la particion test
         particionado.creaParticiones(dataset.datos, seed)
-        errores = np.array(())
-        if len(particionado.particiones) == 1:
+        tam = len(particionado.particiones)
+        if tam == 1:
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
             clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
             return self.error(dTrain, clases), 0
         else:
-            for particion in particionado.particiones:
-                clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
-                dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
-                errores=np.append(errores,[self.error(dTrain, clases)])
+            e= Parallel(n_jobs=-1)(delayed(unwrap_self)(p) for p in zip([self]*tam,particionado.particiones,[clasificador]*tam,[dataset]*tam))
+            errores = np.array(e)
             return errores.mean(), errores.std()
 
 

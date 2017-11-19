@@ -33,7 +33,4 @@ class PreprocesamientoAG(object):
         g=0
         while g<generacionMax and p<pParada:
 
-
-
-
             g+=1
