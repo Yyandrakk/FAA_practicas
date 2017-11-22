@@ -234,8 +234,7 @@ class ClasificadorRegresionLogistica(Clasificador):
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
         i = 0
-        if self.w is None or len(self.w)!= len(diccionario):
-           self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
+        self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
         while i < self.nEpoc:
             for fila in datostrain:
                 aux = np.append([1],fila[:-1])

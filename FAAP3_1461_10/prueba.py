@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score
 import Clasificador
 import EstrategiaParticionado
 from Datos import Datos
+from PreprocesamientoAG import PreprocesamientoAG
 from plotModel import plotModel
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
@@ -13,14 +14,14 @@ from sklearn.model_selection import train_test_split
 if __name__ == '__main__':
     errores =     []
     dataset = Datos('./ConjuntoDatos/wdbc.data')
-    estrategia = EstrategiaParticionado.ValidacionCruzada()
-    #clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100,consApren=0.05)
-   # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
+    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100,consApren=0.1)
+    # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
     #print error_media
-
-    clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100, consApren=0.01)
-    error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
-    print error_media
+    p = PreprocesamientoAG()
+    p.seleccionarAtributos(dataset,clasificador)
+    #clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100, consApren=0.01)
+    #error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
+    #print error_media
 
     # encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1], sparse=False)
     # X = encAtributos.fit_transform(dataset.datos[:, :-1])
