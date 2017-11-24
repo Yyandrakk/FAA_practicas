@@ -13,13 +13,13 @@ from sklearn.model_selection import train_test_split
 if __name__ == '__main__':
     errores =     []
     dataset = Datos('./ConjuntoDatos/wdbc.data')
-    estrategia = EstrategiaParticionado.ValidacionCruzada()
+    estrategia = EstrategiaParticionado.ValidacionSimple()
     #clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100,consApren=0.05)
    # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
     #print error_media
 
     clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100, consApren=0.01)
-    error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
+    error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador)
     print error_media
 
     # encAtributos = preprocessing.OneHotEncoder(categorical_features=dataset.nominalAtributos[:-1], sparse=False)

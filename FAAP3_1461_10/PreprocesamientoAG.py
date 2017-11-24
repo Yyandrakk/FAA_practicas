@@ -4,6 +4,7 @@ import Clasificador
 import EstrategiaParticionado
 from Datos import Datos
 import numpy as np
+from itertools import chain
 
 
 class PreprocesamientoAG(object):
@@ -29,32 +30,23 @@ class PreprocesamientoAG(object):
 
     def __seleccionProgenitores__(self,poblacion):
         sumFit=sum(cro[1] for cro in poblacion)
-        return [self.__selProporcional__(poblacion,sumFit) for i in poblacion]
+        return [self.__selProporcional__(poblacion,sumFit) for _ in poblacion]
 
+    def __fit__(self,col,dataset,clasificador,estrategia):
+        dataSetAux = Datos()
+        colNum = self.__binANum__(col)
+        dataSetAux.datos = dataset.extraeDatosRelevantes(colNum)
+        dataSetAux.diccionarios = dataset.diccionarioRelevante(colNum)
+        dataSetAux.nominalAtributos = dataset.atribDiscretosRelevantes(colNum)
+        e, _ = clasificador.validacion(estrategia, dataSetAux, clasificador)
+        return col, 1 - e
 
     def __fitPob__(self,colActive,dataset,clasificador):
-        pobAux=[]
         estrategia = EstrategiaParticionado.ValidacionSimple()
-        for col in colActive:
-            dataSetAux = Datos()
-            colNum = self.__binANum__(col)
-            dataSetAux.datos = dataset.extraeDatosRelevantes(colNum)
-            dataSetAux.diccionarios = dataset.diccionarioRelevante(colNum)
-            dataSetAux.nominalAtributos = dataset.atribDiscretosRelevantes(colNum)
-            e, _ = clasificador.validacion(estrategia, dataSetAux, clasificador)
-            pobAux.append((col, 1 - e))
-        pobAux.sort(key=lambda t: t[1], reverse=True)
-        return pobAux
+        return sorted([self.__fit__(col,dataset,clasificador,estrategia) for col in colActive],key=lambda t: t[1], reverse=True)
 
     def __cruceUniformePob__(self,pobAux):
-
-        aux = []
-        for p, s in zip(pobAux[0::2], pobAux[1::2]):
-            pa,sa=self.__cruceUniforme__(p,s)
-            aux.append(pa)
-            aux.append(sa)
-
-        return aux
+        return list(chain.from_iterable((self.__cruceUniforme__(p,s) for p, s in zip(pobAux[0::2], pobAux[1::2]))))
 
     def __cruceUniforme__(self,p,s):
         for i in xrange(len(p)):
@@ -63,7 +55,6 @@ class PreprocesamientoAG(object):
         return p,s
 
     def __mutacionPob__(self,pobAux):
-
         return [self.__mutacion__(c) for c in pobAux]
 
     def __mutacion__(self,c):
@@ -74,10 +65,10 @@ class PreprocesamientoAG(object):
 
     def __seleccionSup__(self,pobAux,poblacion):
         aux = []
-        tamElite = math.ceil(self.pElitismo * self.tamPob)
+        tamElite = int(math.ceil(self.pElitismo * self.tamPob))
         aux.extend(poblacion[0:tamElite])
         aux.extend(pobAux[0:(self.tamPob-tamElite)])
-        return aux
+        return sorted(aux,key=lambda t: t[1], reverse=True)
 
 
     def seleccionarAtributos(self,dataset,clasificador):
@@ -88,14 +79,11 @@ class PreprocesamientoAG(object):
         :type clasificador: Clasificador
         :return:
         '''
-
-
         generacionMax,pParada = self.geraciones
         columActive =np.unpackbits(np.random.randint(low=1,high=len(dataset.diccionarios), size=(self.tamPob,1),dtype=np.uint8),axis=1)
         poblacion = self.__fitPob__(columActive,dataset,clasificador)
         g=0
-        p=0
-        while g<generacionMax and all(lambda x: x[1]<pParada,poblacion):
+        while g<generacionMax and all(p[1]<pParada for p in poblacion):
             pobAux = self.__seleccionProgenitores__(poblacion)
             pobAux = self.__cruceUniformePob__(pobAux)
             pobAux = self.__mutacionPob__(pobAux)
@@ -103,4 +91,4 @@ class PreprocesamientoAG(object):
             poblacion = self.__seleccionSup__(pobAux,poblacion)
             g+=1
 
-        return self.__binANum__(poblacion[0][0])
+        return self.__binANum__(poblacion[0][0]), poblacion[0][1]

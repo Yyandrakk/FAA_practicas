@@ -18,7 +18,10 @@ if __name__ == '__main__':
     # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
     #print error_media
     p = PreprocesamientoAG()
-    p.seleccionarAtributos(dataset,clasificador)
+    c,f =p.seleccionarAtributos(dataset,clasificador)
+
+    print c
+    print f
     #clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100, consApren=0.01)
     #error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
     #print error_media
