@@ -9,7 +9,7 @@ from itertools import chain
 
 class PreprocesamientoAG(object):
 
-    def __init__(self,pCruce=0.6,pMut=0.001,pElitismo=0.05, tamPob=50, gener=(50,0.95)):
+    def __init__(self,pCruce=0.6,pMut=0.001,pElitismo=0.05, tamPob=50, gener=(10,0.95)):
         self.pCruce = pCruce
         self.pMut=pMut
         self.pElitismo=pElitismo
@@ -49,22 +49,27 @@ class PreprocesamientoAG(object):
         return list(chain.from_iterable((self.__cruceUniforme__(p,s) for p, s in zip(pobAux[0::2], pobAux[1::2]))))
 
     def __cruceUniforme__(self,p,s):
-        p_init = p
-        s_init = s
         for i in xrange(len(p)):
             if random.random() < self.pCruce:
                 p[i], s[i] = s[i], p[i]
-        return p,s if (sum(p) + sum(s)) != 0 else self.__cruceUniforme__(p_init, s_init)
+
+        if all(x==0 for x in p):
+            p[random.ranint(0,len(p)-1)]=1
+        if all(x==0 for x in s):
+            s[random.ranint(0,len(s)-1)]=1
+        return p,s
 
     def __mutacionPob__(self,pobAux):
         return [self.__mutacion__(c) for c in pobAux]
 
     def __mutacion__(self,c):
-        c_init = c
         for i in xrange(len(c)):
             if random.random() < self.pMut:
                 c[i] = 0 if c[i]==1 else 1
-        return c if (sum(c)) != 0 else self.__mutacion__(c_init)
+
+        if all(x==0 for x in c):
+            c[random.ranint(0,len(c)-1)]=1
+        return c
 
     def __seleccionSup__(self,pobAux,poblacion):
         aux = []
@@ -83,8 +88,13 @@ class PreprocesamientoAG(object):
         :return:
         '''
         generacionMax,pParada = self.geraciones
-        columActive =np.unpackbits(np.random.randint(low=1,high=len(dataset.diccionarios), size=(self.tamPob,1),dtype=np.uint8),axis=1)
-        poblacion = self.__fitPob__(columActive,dataset,clasificador)
+        #columActive =np.unpackbits(,axis=1)
+        tam = len(dataset.diccionarios)
+        intAle = np.random.randint(low=1,high=tam, size=(self.tamPob,1),dtype=np.uint64)
+        binarios = np.array([np.hstack((np.ones(n, dtype=np.uint64), np.zeros(tam - n - 1, dtype=np.uint64))) for n in intAle])
+        binariosAle = np.array(binarios)
+        map(lambda x: np.random.shuffle(x),binariosAle)
+        poblacion = self.__fitPob__(binariosAle,dataset,clasificador)
         g=0
         while g<generacionMax and all(p[1]<pParada for p in poblacion):
             pobAux = self.__seleccionProgenitores__(poblacion)
