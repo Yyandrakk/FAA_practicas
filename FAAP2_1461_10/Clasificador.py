@@ -234,9 +234,4 @@ class ClasificadorRegresionLogistica(Clasificador):
             i=i+1
 
     def clasifica(self, datostest, atributosDiscretos, diccionario):
-
-        clases = []
-        for fila in datostest:
-           aux = np.append([1], fila[:-1])
-           clases.append(1 if self.perceptron(np.dot(self.w,aux)) >= 0.5 else 0 )
-        return np.array(clases)
+        return np.array([1 if self.perceptron(np.dot(self.w,np.append([1], fila[:-1]))) >= 0.5 else 0 for fila in datostest])

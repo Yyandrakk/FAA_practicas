@@ -2,8 +2,12 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import math
+
+from sklearn.externals.joblib import Parallel, delayed
 from sklearn.metrics.pairwise import euclidean_distances
 
+def unwrap_self(arg, **kwarg):
+    return Clasificador.valCruzada(*arg, **kwarg)
 
 class Clasificador(object):
 
@@ -35,6 +39,14 @@ class Clasificador(object):
         return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (aux + 0.0)
 
 
+    def valCruzada(self,particion,clasificador,dataset):
+        clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos,
+                                   dataset.diccionarios)
+        dTrain = dataset.extraeDatosTest(particion.indicesTest)
+        clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+        return self.error(dTrain, clases)
+
+
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
     # TODO: implementar esta funcion
     def validacion(self, particionado, dataset, clasificador, seed=None):
@@ -45,18 +57,15 @@ class Clasificador(object):
         # - Para validacion simple (hold-out): entrenamos el clasificador con la particion de train
         # y obtenemos el error en la particion test
         particionado.creaParticiones(dataset.datos, seed)
-        errores = np.array(())
-        if len(particionado.particiones) == 1:
+        tam = len(particionado.particiones)
+        if tam == 1:
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
             clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
             return self.error(dTrain, clases), 0
         else:
-            for particion in particionado.particiones:
-                clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
-                dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
-                errores=np.append(errores,[self.error(dTrain, clases)])
+            e= Parallel(n_jobs=-1)(delayed(unwrap_self)(p) for p in zip([self]*tam,particionado.particiones,[clasificador]*tam,[dataset]*tam))
+            errores = np.array(e)
             return errores.mean(), errores.std()
 
 
@@ -225,18 +234,21 @@ class ClasificadorRegresionLogistica(Clasificador):
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
 
         i = 0
-        if self.w is None or len(self.w)!= len(diccionario):
-           self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
+        self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
         while i < self.nEpoc:
             for fila in datostrain:
                 aux = np.append([1],fila[:-1])
-                self.w = self.w - (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))*aux
+                try:
+                    self.w = self.w - (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))*aux
+                except ValueError:
+                    print self.w
+                    print aux
+                    print np.dot(self.w,aux)
+                    print self.perceptron(np.dot(self.w,aux))
+                    print fila[-1]
+                    print (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))
+
             i=i+1
 
     def clasifica(self, datostest, atributosDiscretos, diccionario):
-
-        clases = []
-        for fila in datostest:
-           aux = np.append([1], fila[:-1])
-           clases.append(1 if self.perceptron(np.dot(self.w,aux)) >= 0.5 else 0 )
-        return np.array(clases)
+        return np.array([1 if self.perceptron(np.dot(self.w, np.append([1], fila[:-1]))) >= 0.5 else 0 for fila in datostest])

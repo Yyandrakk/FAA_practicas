@@ -1,11 +1,10 @@
+import random
+import math
 import Clasificador
 import EstrategiaParticionado
 from Datos import Datos
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-
 import numpy as np
+from itertools import chain
 
 
 class PreprocesamientoAG(object):
@@ -17,6 +16,64 @@ class PreprocesamientoAG(object):
         self.tamPob=tamPob
         self.geraciones=gener
 
+    def __binANum__(self,col):
+        return np.flatnonzero(col)
+
+    def __selProporcional__(self,pob,fitSum):
+        sel = random.uniform(0, fitSum)
+        acum = 0
+        for c,f in pob:
+            acum += f
+            if acum > sel:
+                return c
+
+
+    def __seleccionProgenitores__(self,poblacion):
+        sumFit=sum(cro[1] for cro in poblacion)
+        return [self.__selProporcional__(poblacion,sumFit) for _ in poblacion]
+
+    def __fit__(self,col,dataset,clasificador,estrategia):
+        dataSetAux = Datos()
+        colNum = self.__binANum__(col)
+        dataSetAux.datos = dataset.extraeDatosRelevantes(colNum)
+        dataSetAux.diccionarios = dataset.diccionarioRelevante(colNum)
+        dataSetAux.nominalAtributos = dataset.atribDiscretosRelevantes(colNum)
+        e, _ = clasificador.validacion(estrategia, dataSetAux, clasificador)
+        return col, 1 - e
+
+    def __fitPob__(self,colActive,dataset,clasificador):
+        estrategia = EstrategiaParticionado.ValidacionSimple()
+        return sorted([self.__fit__(col,dataset,clasificador,estrategia) for col in colActive],key=lambda t: t[1], reverse=True)
+
+    def __cruceUniformePob__(self,pobAux):
+        return list(chain.from_iterable((self.__cruceUniforme__(p,s) for p, s in zip(pobAux[0::2], pobAux[1::2]))))
+
+    def __cruceUniforme__(self,p,s):
+        p_init = p
+        s_init = s
+        for i in xrange(len(p)):
+            if random.random() < self.pCruce:
+                p[i], s[i] = s[i], p[i]
+        return p,s if (sum(p) + sum(s)) != 0 else self.__cruceUniforme__(p_init, s_init)
+
+    def __mutacionPob__(self,pobAux):
+        return [self.__mutacion__(c) for c in pobAux]
+
+    def __mutacion__(self,c):
+        c_init = c
+        for i in xrange(len(c)):
+            if random.random() < self.pMut:
+                c[i] = 0 if c[i]==1 else 1
+        return c if (sum(c)) != 0 else self.__mutacion__(c_init)
+
+    def __seleccionSup__(self,pobAux,poblacion):
+        aux = []
+        tamElite = int(math.ceil(self.pElitismo * self.tamPob))
+        aux.extend(poblacion[0:tamElite])
+        aux.extend(pobAux[0:(self.tamPob-tamElite)])
+        return sorted(aux,key=lambda t: t[1], reverse=True)
+
+
     def seleccionarAtributos(self,dataset,clasificador):
         '''
         :param dataset:
@@ -25,18 +82,18 @@ class PreprocesamientoAG(object):
         :type clasificador: Clasificador
         :return:
         '''
-        #if type(dataset) != Datos or type(clasificador) != Clasificador:
-        #    raise TypeError, "dataset debe ser tipo Datos y clasificador de tipo Clasificador"
-
-        generacionMax, pParada = self.geraciones
-        poblacion = np.unpackbits(np.random.randint(low=1,high=len(dataset.diccionarios), size=(self.tamPob,1),dtype=np.uint8),axis=1)
-        dataset.datos = dataset.extraeDatosRelevantes(poblacion)
-        g = 0
-        p = 0
-        estrategia = EstrategiaParticionado.ValidacionSimple()
-        while g < generacionMax and p < pParada:
-            error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador, 42)
-            p = 1 - error_media
+        generacionMax,pParada = self.geraciones
+        columActive =np.unpackbits(np.random.randint(low=1,high=len(dataset.diccionarios), size=(self.tamPob,1),dtype=np.uint8),axis=1)
+        poblacion = self.__fitPob__(columActive,dataset,clasificador)
+        g=0
+        while g<generacionMax and all(p[1]<pParada for p in poblacion):
+            pobAux = self.__seleccionProgenitores__(poblacion)
+            pobAux = self.__cruceUniformePob__(pobAux)
+            pobAux = self.__mutacionPob__(pobAux)
+            pobAux = self.__fitPob__(pobAux,dataset,clasificador)
+            poblacion = self.__seleccionSup__(pobAux,poblacion)
+            print "####################################"
+            print g
             g+=1
 
-        print error_media, error_std
+        return self.__binANum__(poblacion[0][0]), poblacion[0][1]
