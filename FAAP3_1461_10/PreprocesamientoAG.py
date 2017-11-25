@@ -9,7 +9,7 @@ from itertools import chain
 
 class PreprocesamientoAG(object):
 
-    def __init__(self,pCruce=0.6,pMut=0.001,pElitismo=0.05, tamPob=50, gener=(10,0.95)):
+    def __init__(self,pCruce=0.6,pMut=0.001,pElitismo=0.05, tamPob=50, gener=(50,0.95)):
         self.pCruce = pCruce
         self.pMut=pMut
         self.pElitismo=pElitismo
