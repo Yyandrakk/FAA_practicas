@@ -49,12 +49,25 @@ class PreprocesamientoAG(object):
         return list(chain.from_iterable((self.__cruceUniforme__(p,s) for p, s in zip(pobAux[0::2], pobAux[1::2]))))
 
     def __cruceUniforme__(self,p,s):
-        p_init = p
-        s_init = s
         for i in xrange(len(p)):
             if random.random() < self.pCruce:
                 p[i], s[i] = s[i], p[i]
-        return p,s if (sum(p) + sum(s)) != 0 else self.__cruceUniforme__(p_init, s_init)
+        if sum(p) != 0 and sum(s) != 0:
+            return p,s
+        elif (sum(p) + sum(s)) == 0:
+            r = random.randint(0, len(p)-1)
+            p[r] = 1
+            r = random.randint(0, len(s)-1)
+            s[r] = 1
+            return p, s
+        elif sum(p) == 0:
+            r = random.randint(0, len(p)-1)
+            p[r] = 1
+            return p, s
+        elif sum(s) == 0:
+            r = random.randint(0, len(s)-1)
+            s[r] = 1
+            return p, s
 
     def __mutacionPob__(self,pobAux):
         return [self.__mutacion__(c) for c in pobAux]
@@ -64,7 +77,12 @@ class PreprocesamientoAG(object):
         for i in xrange(len(c)):
             if random.random() < self.pMut:
                 c[i] = 0 if c[i]==1 else 1
-        return c if (sum(c)) != 0 else self.__mutacion__(c_init)
+        if (sum(c)) != 0:
+            return c
+        else:
+            r = random.randint(0, len(c)-1)
+            c[r] = 1
+            return c
 
     def __seleccionSup__(self,pobAux,poblacion):
         aux = []
