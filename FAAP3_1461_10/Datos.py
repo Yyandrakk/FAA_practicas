@@ -58,10 +58,17 @@ class Datos(object):
         return self.datos[idx, :]
 
     def extraeDatosRelevantes(self,idx):
-        return self.datos[:,idx]
+        return self.datos[:,np.append(idx,len(self.diccionarios)-1)]
 
     def diccionarioRelevante(self,idx):
-        return [ self.diccionarios[i] for i in idx]
+        aux = [ self.diccionarios[i] for i in idx]
+        aux.append(self.diccionarios[-1])
+        return aux
 
     def atribDiscretosRelevantes(self,idx):
-        return [ self.nominalAtributos[i] for i in idx]
+        aux= [ self.nominalAtributos[i] for i in idx]
+        aux.append(self.nominalAtributos[-1])
+        return aux
+
+    def atribNombre(self, idx):
+        return [self.nombreAtributos[i] for i in idx]
