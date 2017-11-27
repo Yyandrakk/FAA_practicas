@@ -88,7 +88,6 @@ class PreprocesamientoAG(object):
         :return:
         '''
         generacionMax,pParada = self.geraciones
-        #columActive =np.unpackbits(,axis=1)
         tam = len(dataset.diccionarios)
         intAle = np.random.randint(low=1,high=tam, size=(self.tamPob,1),dtype=np.uint64)
         binarios = np.array([np.hstack((np.ones(n, dtype=np.uint64), np.zeros(tam - n - 1, dtype=np.uint64))) for n in intAle])
