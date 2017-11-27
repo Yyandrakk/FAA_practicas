@@ -17,7 +17,7 @@ if __name__ == '__main__':
     clasificador = Clasificador.ClasificadorRegresionLogistica(nEpoc=100,consApren=0.1)
     # error_media, error_std = clasificador.validacion(estrategia, dataset, clasificador,45)
     #print error_media
-    p = PreprocesamientoAG()
+    p = PreprocesamientoAG() 
     c,f =p.seleccionarAtributos(dataset,clasificador)
 
     print c

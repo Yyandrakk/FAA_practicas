@@ -95,7 +95,7 @@ class PreprocesamientoAG(object):
         binariosAle = np.array(binarios)
         map(lambda x: np.random.shuffle(x),binariosAle)
         poblacion = self.__fitPob__(binariosAle,dataset,clasificador)
-        g=0
+        g=0                                
         while g<generacionMax and poblacion[0][1]<pParada:
             pobAux = self.__seleccionProgenitores__(poblacion)
             pobAux = self.__cruceUniformePob__(pobAux)
