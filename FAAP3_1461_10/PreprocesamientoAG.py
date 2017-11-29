@@ -4,8 +4,15 @@ import Clasificador
 import EstrategiaParticionado
 from Datos import Datos
 import numpy as np
-from itertools import chain
+from itertools import chain, izip
+from sklearn.externals.joblib import Parallel, delayed
 
+def unwrap_self_fit(arg, **kwarg):
+    return PreprocesamientoAG.__fit__(*arg, **kwarg)
+
+
+def unwrap_self_mut(arg, **kwarg):
+    return PreprocesamientoAG.__mutacion__(*arg, **kwarg)
 
 class PreprocesamientoAG(object):
 
@@ -42,8 +49,10 @@ class PreprocesamientoAG(object):
         return col, 1 - e
 
     def __fitPob__(self,colActive,dataset,clasificador):
-        estrategia = EstrategiaParticionado.ValidacionSimple()
-        return sorted([self.__fit__(col,dataset,clasificador,estrategia) for col in colActive],key=lambda t: t[1], reverse=True)
+        estrategia = EstrategiaParticionado.ValidacionSimple(porcentajeTrain=0.7)
+        tam = len(colActive)
+        l=Parallel(n_jobs=-1)(delayed(unwrap_self_fit)(p) for p in  izip([self] * tam, colActive, [dataset] * tam,[clasificador] * tam, [estrategia]*tam))
+        return sorted(l,key=lambda t: t[1], reverse=True)
 
     def __cruceUniformePob__(self,pobAux):
         return list(chain.from_iterable((self.__cruceUniforme__(p,s) for p, s in zip(pobAux[0::2], pobAux[1::2]))))
@@ -54,13 +63,14 @@ class PreprocesamientoAG(object):
                 p[i], s[i] = s[i], p[i]
 
         if all(x==0 for x in p):
-            p[random.ranint(0,len(p)-1)]=1
+            p[random.randint(0,len(p)-1)]=1
         if all(x==0 for x in s):
-            s[random.ranint(0,len(s)-1)]=1
+            s[random.randint(0,len(s)-1)]=1
+
         return p,s
 
     def __mutacionPob__(self,pobAux):
-        return [self.__mutacion__(c) for c in pobAux]
+        return Parallel(n_jobs=-1)(delayed(unwrap_self_mut)(p) for p in  zip([self] * len(pobAux), pobAux))
 
     def __mutacion__(self,c):
         for i in xrange(len(c)):
@@ -68,7 +78,7 @@ class PreprocesamientoAG(object):
                 c[i] = 0 if c[i]==1 else 1
 
         if all(x==0 for x in c):
-            c[random.ranint(0,len(c)-1)]=1
+            c[random.randint(0,len(c)-1)]=1
         return c
 
     def __seleccionSup__(self,pobAux,poblacion):
@@ -102,8 +112,6 @@ class PreprocesamientoAG(object):
             pobAux = self.__mutacionPob__(pobAux)
             pobAux = self.__fitPob__(pobAux,dataset,clasificador)
             poblacion = self.__seleccionSup__(pobAux,poblacion)
-            print "####################################"
-            print g
             g+=1
 
         return self.__binANum__(poblacion[0][0]), poblacion[0][1]
