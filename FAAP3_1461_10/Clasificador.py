@@ -3,6 +3,11 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import math
 
+from sklearn.externals.joblib import Parallel, delayed
+from sklearn.metrics.pairwise import euclidean_distances
+
+def unwrap_self(arg, **kwarg):
+    return Clasificador.valCruzada(*arg, **kwarg)
 
 class Clasificador(object):
 
@@ -28,7 +33,18 @@ class Clasificador(object):
     # Obtiene el numero de aciertos y errores para calcular la tasa de fallo
     # TODO: implementar
     def error(self, datos, pred):
-        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (len(datos[:, -1]) + 0.0)
+        aux = len(datos[:, -1])
+        if aux == 0:
+            aux = 0.0000001
+        return sum(map(lambda x, y: 0 if x == y else 1, datos[:, -1], pred)) / (aux + 0.0)
+
+
+    def valCruzada(self,particion,clasificador,dataset):
+        clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos,
+                                   dataset.diccionarios)
+        dTrain = dataset.extraeDatosTest(particion.indicesTest)
+        clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
+        return self.error(dTrain, clases)
 
 
     # Realiza una clasificacion utilizando una estrategia de particionado determinada
@@ -41,18 +57,15 @@ class Clasificador(object):
         # - Para validacion simple (hold-out): entrenamos el clasificador con la particion de train
         # y obtenemos el error en la particion test
         particionado.creaParticiones(dataset.datos, seed)
-        errores = np.array(())
-        if len(particionado.particiones) == 1:
+        tam = len(particionado.particiones)
+        if tam == 1:
             clasificador.entrenamiento(dataset.extraeDatosTrain(particionado.particiones[0].indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
             dTrain = dataset.extraeDatosTest(particionado.particiones[0].indicesTest)
             clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
             return self.error(dTrain, clases), 0
         else:
-            for particion in particionado.particiones:
-                clasificador.entrenamiento(dataset.extraeDatosTrain(particion.indicesTrain), dataset.nominalAtributos, dataset.diccionarios)
-                dTrain = dataset.extraeDatosTest(particion.indicesTest)
-                clases = clasificador.clasifica(dTrain, dataset.nominalAtributos, dataset.diccionarios)
-                errores=np.append(errores,[self.error(dTrain, clases)])
+            e= Parallel(n_jobs=-1)(delayed(unwrap_self)(p) for p in zip([self]*tam,particionado.particiones,[clasificador]*tam,[dataset]*tam))
+            errores = np.array(e)
             return errores.mean(), errores.std()
 
 
@@ -68,8 +81,7 @@ class ClasificadorNaiveBayes(Clasificador):
 
     # TODO: implementar
     def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
-        self.tablasV = []
-        self.tablaC = {}
+
         tam = len(diccionario)-1
         nClases = len(diccionario[-1])
         i = 0
@@ -128,3 +140,115 @@ class ClasificadorNaiveBayes(Clasificador):
             clases.append(diccionario[-1][max(posterior,key=posterior.get)])
 
         return np.array(clases)
+
+
+class ClasificadorVecinosProximos(Clasificador):
+
+    def __init__(self, k=3, norm=True):
+        self.k = k
+        self.listaMediasDesv = []
+        self.norm = norm
+        self.datosTrainNormalizado = None
+
+    def normalizarDatos(self, datos):
+        i = 0
+        tam = len(self.listaMediasDesv)
+        aux = np.zeros(datos.shape)
+        while i < tam:
+            if self.listaMediasDesv[i]:
+                aux[:,i] = (datos[:,i]-self.listaMediasDesv[i]["media"])/(self.listaMediasDesv[i]["desv"]+0.0)
+            else:
+                aux[:,i] = datos[:, i]
+            i=i+1
+        aux[:,i] = datos[:, i]
+
+        return aux
+
+    def calcularMediasDesv(self,datostrain,nCol):
+        aux = {}
+        aux["media"] = np.mean(datostrain[:,nCol])
+        aux["desv"] = np.std(datostrain[:,nCol])
+        self.listaMediasDesv[nCol] = (aux)
+
+    def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
+        if self.norm:
+            tam = len(diccionario)-1
+            i = 0
+	
+            self.listaMediasDesv = [None] * tam
+
+            while i < tam:
+
+                if atributosDiscretos[i]:
+                    self.listaMediasDesv[i] = {}
+                else:
+                    self.calcularMediasDesv(datostrain,i)
+                i += 1
+
+            self.datosTrainNormalizado = self.normalizarDatos(datostrain)
+        else:
+            self.datosTrainNormalizado = datostrain
+
+    def clasifica(self, datostest, atributosDiscretos, diccionario):
+
+        if self.norm:
+            datosNorm = self.normalizarDatos(datostest)
+        else:
+            datosNorm = datostest
+
+        tam = len(diccionario) - 1
+        i = 0
+        clases = []
+        for fila in datosNorm:
+            dstEu = euclidean_distances(self.datosTrainNormalizado[:,:-1], [fila[:-1]]).tolist()
+
+            aux = []
+
+            for row in dstEu:
+                aux.append(row[0])
+            sortIndex = np.argsort(aux)
+
+            KvecinosProximos=self.datosTrainNormalizado[sortIndex[0:self.k],-1]
+
+            clases.append(np.bincount(KvecinosProximos.tolist()).argmax())
+
+        return np.array(clases).astype('float')
+
+
+
+
+class ClasificadorRegresionLogistica(Clasificador):
+
+    def __init__(self, consApren=1,nEpoc=50,w = None):
+        self.consApren = consApren
+        self.nEpoc = nEpoc
+        self.w = w
+
+    def perceptron(self,p):
+        try:
+           aux=1.0/(1+math.exp(-p))
+        except OverflowError:
+            aux= 0.0 # 1/ inf = 0
+        return aux
+
+    def entrenamiento(self, datostrain, atributosDiscretos, diccionario):
+
+        i = 0
+        self. w = np.random.uniform(low=-0.5,high=0.5, size=(1,len(diccionario)))
+        while i < self.nEpoc:
+            for fila in datostrain:
+                aux = np.append([1],fila[:-1])
+                try:
+                    self.w = self.w - (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))*aux
+                except ValueError:
+                    print self.w
+                    print aux
+                    print np.dot(self.w,aux)
+                    print self.perceptron(np.dot(self.w,aux))
+                    print fila[-1]
+                    print (self.consApren*(self.perceptron(np.dot(self.w,aux))-fila[-1]))
+
+            i=i+1
+
+    def clasifica(self, datostest, atributosDiscretos, diccionario):
+        return np.array([1 if self.perceptron(np.dot(self.w, np.append([1], fila[:-1]))) >= 0.5 else 0 for fila in datostest])

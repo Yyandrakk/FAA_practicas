@@ -4,20 +4,16 @@ import numpy as np
 class Datos(object):
 
     TiposDeAtributos = ('Continuo', 'Nominal')
-    tipoAtributos = []
-    nombreAtributos = []
-    nominalAtributos = []
-    datos = np.array(())
-    # Lista de diccionarios. Uno por cada atributo.
-    diccionarios = []
 
     # TODO: procesar el fichero para asignar correctamente las variables tipoAtributos, nombreAtributos,nominalAtributos, datos y diccionarios
-    def __init__(self, nombreFichero):
+    def __init__(self, nombreFichero=None):
         self.tipoAtributos = []
         self.nombreAtributos = []
         self.nominalAtributos = []
         self.datos = np.array(())
         self.diccionarios = []
+        if nombreFichero == None:
+            return
         with open(nombreFichero, 'r') as f:
             linesL = f.read().splitlines()
             con, nom = self.TiposDeAtributos
@@ -60,3 +56,19 @@ class Datos(object):
 
     def extraeDatosTest(self, idx):
         return self.datos[idx, :]
+
+    def extraeDatosRelevantes(self,idx):
+        return self.datos[:,np.append(idx,len(self.diccionarios)-1)]
+
+    def diccionarioRelevante(self,idx):
+        aux = [ self.diccionarios[i] for i in idx]
+        aux.append(self.diccionarios[-1])
+        return aux
+
+    def atribDiscretosRelevantes(self,idx):
+        aux= [ self.nominalAtributos[i] for i in idx]
+        aux.append(self.nominalAtributos[-1])
+        return aux
+
+    def atribNombre(self, idx):
+        return [self.nombreAtributos[i] for i in idx]

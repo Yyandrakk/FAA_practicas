@@ -40,6 +40,7 @@ class ValidacionSimple(EstrategiaParticionado):
     # Devuelve una lista de particiones (clase Particion)
     # TODO: implementar
     def creaParticiones(self, datos, seed=None):
+        self.particiones = []
         random.seed(seed)
         numFilas = datos.shape[0]
         particion = Particion()
@@ -66,6 +67,7 @@ class ValidacionCruzada(EstrategiaParticionado):
     # TODO: implementar
 
     def creaParticiones(self, datos, seed=None):
+        self.particiones = []
         random.seed(seed)
         numFilas = datos.shape[0]
         index = list(xrange(0, numFilas))
